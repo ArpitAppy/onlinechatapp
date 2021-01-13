@@ -25,7 +25,8 @@ const pusher = new Pusher({
 const whitelist = [
     "http://localhost:3000",
     "http://localhost:8080",
-    "http://staging.appyvilla.com"
+    "https://floating-crag-49021.herokuapp.com",
+    "*"
   ];
   const corsOptions = {
     origin: function (origin, callback) {
