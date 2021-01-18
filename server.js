@@ -89,34 +89,49 @@ db.once("open", () => {
 
 })
 
-// io.on('connection', (socket) => {
+io.on('connection', (socket) => {
 
-//     console.log("connected")
-//     // Get the last 10 messages from the database.
-//     Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
-//       if (err) return console.error(err);
+  console.log('new connection established')
+
+  socket.on('join', (name, chatroom) => {
+      socket.join(chatroom)
+
+      socket.emit('message', generateMessage('Admin', 'Welcome!'))
+      socket.broadcast.to(chatroom).emit('message', generateMessage('Admin', `${name} has joined!`))
+      io.to(chatroom).emit('roomData', {
+          chatroom,
+          name
+      })
+
+      callback()
+  })
+
+    // console.log("connected")
+    // // Get the last 10 messages from the database.
+    // Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
+    //   if (err) return console.error(err);
   
-//       // Send the last messages to the user.
-//       socket.emit('init', messages);
-//     });
+    //   // Send the last messages to the user.
+    //   socket.emit('init', messages);
+    // });
   
-//     // Listen to connected users for a new message.
-//     socket.on('message', (msg) => {
-//       // Create a message with the content and the name of the user.
-//       const message = new Message({
-//         content: msg.content,
-//         name: msg.name,
-//       });
+    // // Listen to connected users for a new message.
+    // socket.on('message', (msg) => {
+    //   // Create a message with the content and the name of the user.
+    //   const message = new Message({
+    //     content: msg.content,
+    //     name: msg.name,
+    //   });
   
-//       // Save the message to the database.
-//       message.save((err) => {
-//         if (err) return console.error(err);
-//       });
+    //   // Save the message to the database.
+    //   message.save((err) => {
+    //     if (err) return console.error(err);
+    //   });
   
-//       // Notify all other users about a new message.
-//       socket.broadcast.emit('push', msg);
-//     });
-//   });
+    //   // Notify all other users about a new message.
+    //   socket.broadcast.emit('push', msg);
+    // });
+  });
 
 http.listen(process.env.PORT || 8080, () => {
     console.log(`Server is running on port ${process.env.PORT || 8080}`);

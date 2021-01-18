@@ -6,6 +6,14 @@ var ChatRoomSchema = new mongoose.Schema({
     name : {
         type: String,
         required: true
+    },
+    from : {
+        type: String,
+        required: true
+    },
+    to : {
+        type: String,
+        required: true
     }
 
 })

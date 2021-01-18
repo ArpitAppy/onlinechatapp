@@ -8,11 +8,11 @@ var MessageSchema = new mongoose.Schema({
         required: true,
         ref: Users
     },
-    // chatroom: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     required: true,
-    //     ref: ChatRoom
-    // },
+    chatroom: {
+        type: String,
+        required: true,
+        ref: ChatRoom
+    },
     message: String,
     timestamp: String,        
     receiver: Boolean,

@@ -4,14 +4,16 @@ const { ResponseJson } = require('../utils/common');
 
 const createChatRoom = async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, from, to } = req.body;
         let chatroom = await ChatRoom.findOne({name});
         if (chatroom) {
             return ResponseJson(res, 200, true, 'Already created', {chatroom}, {});
         }
 
         const newChatRoom = new ChatRoom({
-            name
+            name,
+            from,
+            to
         });
 
         await newChatRoom.save(async function(err, chatroom) {

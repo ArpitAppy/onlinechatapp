@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
                 return ResponseJson(res, 500, false, "Error occured. Please try again !!", {}, {} );
             }
 
-            const token = await jwtGenerator(uid);
+            const token = await jwtGenerator(uid, fullName);
             return ResponseJson(res, 200, true, "User Registered Successfully", {user, token}, {});
         })
     } catch (err) {
@@ -51,7 +51,7 @@ const loginUser = async (req, res) => {
         if (user.password !== password) {
             return ResponseJson(res, 401, false, "Unauthorized Users!", {}, {})
         }
-        const token = await jwtGenerator(user.uid);
+        const token = await jwtGenerator(user.uid, user.fullName);
         return ResponseJson(res, 200, true, "User Verified Successfully", {user, token}, {});
     } catch (err) {
         return ResponseJson(res, 500, false, err, {}, err)
