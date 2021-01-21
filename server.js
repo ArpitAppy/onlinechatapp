@@ -13,7 +13,12 @@ const http = require("http").Server(app);
 
 const io = require('socket.io')(http, {
   cors: {
-    origin: "https://floating-crag-49021.herokuapp.com",
+    origin: [
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "https://floating-crag-49021.herokuapp.com",
+    "*"
+  ],
     methods: ["GET", "POST"]
   }
 });
@@ -123,7 +128,7 @@ socket.on('onTyping', (name) => {
 })
 
 socket.on('markAsRead', (name) => {
-  socket.to(name).emit('markAsSeen', message)
+  socket.to(name).emit('markAsSeen', name)
 })
 
   socket.on('disconnect', () => {
