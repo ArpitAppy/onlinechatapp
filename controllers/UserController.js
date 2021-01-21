@@ -39,6 +39,20 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+// Get User Details
+const getUserDetails = async (req, res) => {
+    try {
+        let { fullName } = req.query;
+        let user = await Users.findOne({fullName})
+        if (!user) {
+            return ResponseJson(res, 400, false, 'No User Found', {}, {})
+        }
+        return ResponseJson(res, 200, true, 'User Fetch Successfully !!', user, {})
+    } catch (err) {
+        return ResponseJson(res, 400, false, err, {}, err)
+    }
+}
+
 // Login User
 
 const loginUser = async (req, res) => {
@@ -61,5 +75,6 @@ const loginUser = async (req, res) => {
 module.exports = {
     registerUser,
     getAllUsers,
-    loginUser
+    loginUser,
+    getUserDetails
 }

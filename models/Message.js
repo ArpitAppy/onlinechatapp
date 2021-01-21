@@ -3,6 +3,7 @@ const ChatRoom = require('./ChatRoom');
 const Users = require('./Users');
 
 var MessageSchema = new mongoose.Schema({
+    mid: String,
     user: {
         type: String,
         required: true,
@@ -14,8 +15,10 @@ var MessageSchema = new mongoose.Schema({
         ref: ChatRoom
     },
     message: String,
-    timestamp: String,        
-    receiver: Boolean,
+    from: String,
+    to: String,
+    timestamp: String,
+    sent: Boolean,        
     read: Boolean
 })
 

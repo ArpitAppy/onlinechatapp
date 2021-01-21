@@ -11,7 +11,12 @@ const mongoose = require('mongoose');
 //app configs
 const http = require("http").Server(app);
 
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
 
 const pusher = new Pusher({
     appId: "1137134",
@@ -55,6 +60,9 @@ const userRoute = require('./routes/user');
 const messageRoute = require('./routes/message');
 const chatroomRoute = require('./routes/chatroom');
 const Message = require('./models/Message');
+const { registerUser } = require('./controllers/UserController');
+const Users = require('./models/Users');
+const ChatRoom = require('./models/ChatRoom');
 
 // APIs Routes
 const url = '/api/v1/';
@@ -79,7 +87,6 @@ db.once("open", () => {
                 user: messageDetails.user,
                 message: messageDetails.message,
                 timestamp: messageDetails.timestamp,
-                receiver: messageDetails.receiver,
                 read: messageDetails.read
             })
         } else {
@@ -91,47 +98,39 @@ db.once("open", () => {
 
 io.on('connection', (socket) => {
 
-  console.log('new connection established')
+  console.log('new connection established', socket.id)
 
-  socket.on('join', (name, chatroom) => {
-      socket.join(chatroom)
 
-      socket.emit('message', generateMessage('Admin', 'Welcome!'))
-      socket.broadcast.to(chatroom).emit('message', generateMessage('Admin', `${name} has joined!`))
-      io.to(chatroom).emit('roomData', {
-          chatroom,
-          name
-      })
 
-      callback()
+  socket.on('join', (name) => {
+    let rooms = io.sockets.adapter.rooms
+    console.log("rooms", rooms)
+    socket.join(name)
+})
+
+socket.on('message', (name) => {
+  socket.to(name.chatroom).emit('sendMessage', {status: true})
+})
+
+// socket.on('receivedMessage', (chatroom) => {
+//   socket.emit('')
+// })
+
+socket.on('onTyping', (name) => {
+  if (name.text && name.text.length > 0)
+    socket.to(name.chatroom).emit('typing', {username: name.name, status: true});
+  else socket.to(name.chatroom).emit('typing', {username: name.name, status: false});
+})
+
+socket.on('markAsRead', (name) => {
+  socket.to(name).emit('markAsSeen', message)
+})
+
+  socket.on('disconnect', () => {
+    console.log('disconnected')
   })
 
-    // console.log("connected")
-    // // Get the last 10 messages from the database.
-    // Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
-    //   if (err) return console.error(err);
-  
-    //   // Send the last messages to the user.
-    //   socket.emit('init', messages);
-    // });
-  
-    // // Listen to connected users for a new message.
-    // socket.on('message', (msg) => {
-    //   // Create a message with the content and the name of the user.
-    //   const message = new Message({
-    //     content: msg.content,
-    //     name: msg.name,
-    //   });
-  
-    //   // Save the message to the database.
-    //   message.save((err) => {
-    //     if (err) return console.error(err);
-    //   });
-  
-    //   // Notify all other users about a new message.
-    //   socket.broadcast.emit('push', msg);
-    // });
-  });
+});
 
 http.listen(process.env.PORT || 8080, () => {
     console.log(`Server is running on port ${process.env.PORT || 8080}`);
